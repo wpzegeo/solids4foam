@@ -22,4 +22,4 @@
     - #### Running the Case
     - #### Structure
 
-![](image/Picture2.png)
+![](images/Picture2.png)
