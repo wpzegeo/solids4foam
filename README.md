@@ -5,12 +5,12 @@
 
 - ### [Overview](https://wpzegeo.github.io/solids4foam/README/Overview)
 
-- ### My First Solids Case
+- ### [My First Solid Case](https://wpzegeo.github.io/solids4foam/README/tutorial/my_first_solid_case)
     - #### Overview
     - #### Theory
     - #### Running the Case
     - #### Structure
-- ### My First Fluids Case
+- ### [My First Fluid Case](https://wpzegeo.github.io/solids4foam/README/tutorial/my_first_fluid_case)
     - #### Overview
     - #### Theory
     - #### Running the Case
