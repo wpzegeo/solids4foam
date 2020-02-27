@@ -23,7 +23,7 @@ solids4foam builds on the toolboxes *stressAnalysis*, *solidMechanics* and *exte
 
 <img src="tutorial/images/mod_a_5.PNG" width = 700 >
 
-<img src="tutorial/images/mod_a_6.PNG" width = 700 >
+<img src="tutorial/images/mod_a_6.PNG" width = 745 >
 
 <img src="tutorial/images/mod_a_7new.PNG" width = 700 >
 
