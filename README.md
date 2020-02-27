@@ -24,4 +24,4 @@
 
 ![README](README/Picture2.png)
 ![image](image/Picture2.png)
-
+![tutorial](README/tutorial/Picture2.png)
