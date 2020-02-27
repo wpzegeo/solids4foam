@@ -21,3 +21,5 @@
     - #### Theory
     - #### Running the Case
     - #### Structure
+
+![](images/Picture2.png)
