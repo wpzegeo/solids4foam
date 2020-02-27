@@ -13,7 +13,15 @@ In addition, the toolbox should be compatible will all major OpenFOAM forks, as 
 solids4foam builds on the toolboxes *stressAnalysis*, *solidMechanics* and *extendBazaar*
 
 ### Modular Approach
-mod pics
+
+![](tutorial/image/Modular_app_1.png)
+![](tutorial/image/mod_app_2.png)
+![](tutorial/image/mod_a_3.png)
+![](tutorial/image/mod_a_4.png)
+![](tutorial/image/mod_a_5.png)
+![](tutorial/image/mod_a_6.png)
+![](tutorial/image/mod_a_7.png)
+
 
 ### Coding Style
 
