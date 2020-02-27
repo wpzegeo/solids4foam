@@ -3,7 +3,7 @@
 
 
 ## Case Overview
-pic
+![](images/sol_overview_1.PNG)
 
 This case analyses the stresses and displacements generated in a spherical pressure vessel subjected to an increasing internal pressure and temperature.
 
@@ -14,7 +14,7 @@ The outer surface of the vessel is stress/traction free and the heat flux is giv
 *internal pressure and temperature are a function of time
 
 ## Expected Results
-pic
+![](images/sol_expres_1.PNG)
 
 
 
@@ -27,15 +27,16 @@ pic
 - The conservation equations are linear momentum (linear geometry form) and energy (heat equation form):
 
 
-<!-- Photos of equations-->
+![](images/sol_theory_1.PNG)
+
 
 - Finally we will assume the deformation to be elastic (no permanent deformation) and the stress to be given by the Duhamel-Neumann form of Hooke’s law (i.e. Hooke’s law with thermal stress term):
 
-<!-- Photos of equations-->
+![](images/sol_theory_2.PNG)
 
 - Three mechanical properties must be specified: Elastic/Young’s modulus (E), Poisson’s ratio (ν) and the coefficient of linear thermal expansion (α). The Lamé parameters are then calculated as:
 
-<!-- Photos of equations-->
+![](images/sol_theory_3.PNG)
 
 ### Theory: solution methodology
 
@@ -122,20 +123,25 @@ $> touch case.foam && paraview case.foam
 $> # or paraFoam
 $> # or paraFoam -nativeReader
 ```
+![](images/sol_runcase_2.PNG)
 
-<!-- Pictures of paraview -->
+![](images/sol_runcase_1.PNG)
 
 The stress tensor has 6 components
 
-2 pic of directions
+![](images/sol_runcase_4.PNG)
+
+![](images/sol_runcase_3.PNG)
+
 
 The von Mises stress (aka equivalent stress, sigmaEq) is commonly used to assess regions closest to failure:
 
-pic of eq
+![](images/sol_runcase_5.PNG)
 
 The strain tensor also has 6 components; and we can define an equivalent strain compatible with the equivalent stress.
 
-pic of strain
+![](images/sol_runcase_6.PNG)
+
 
 *These definitions of strain are only correct when the strains AND rotations are small; otherwise, see large/finite strain measures (e.g. Green strain, true strain) in e.g. Mase, Male, 1999, Continuum Mechanics for Engineers
 
@@ -219,7 +225,7 @@ outside
     value           uniform 300;
 }
 ```
-pic of equations
+<img src="images/sol_runcase_7.PNG" width = "300" >
 
 and a time-varying temperature on the inside wall:
 ```
