@@ -123,16 +123,13 @@ $> touch case.foam && paraview case.foam
 $> # or paraFoam
 $> # or paraFoam -nativeReader
 ```
+![](images/sol_runcase_1.png)
 ![](images/sol_runcase_2.PNG)
-
-![](images/sol_runcase_1.PNG)
 
 The stress tensor has 6 components
 
+<img src="images/sol_runcase_3.png" width = "350">
 ![](images/sol_runcase_4.PNG)
-
-![](images/sol_runcase_3.PNG)
-
 
 The von Mises stress (aka equivalent stress, sigmaEq) is commonly used to assess regions closest to failure:
 
@@ -314,7 +311,7 @@ Remember the equations discussed previously in the “Theory” section; we will
 
 A “solid” analysis requires the definition of the mechanical properties via the **mechanicalProperties** dictionary; in this case the *thermoLinearElastic* law is specified (Duhamel-Nuemann form of Hooke’s law):
 
-pic of equation
+![](images/sol_runcase_8.PNG)
 
 ```
 mechanical
@@ -332,7 +329,7 @@ mechanical
 ```
 As we are performing a heat analysis, we also need to specify the thermal properties via the **thermalProperties** dictionary; in this case the constant law is specified (Fourier’s conduction law) by specific heat (C) and thermal conductivity (k):
 
-pic of equation
+![](images/sol_runcase_9.PNG)
 ```
 thermal
 {
@@ -428,7 +425,7 @@ $> # or “touch case.foam && paraview case.foam”
 ```
 ### **hotSphere**: parallelisation
 
-<!--images-->
+![](images/sol_par_1.PNG)
 
 ## Case Settings
 Next, we will explain the purpose of different **numerical settings** (physical properties, such as *g*, *mechanicalProperties* and *thermalProperties* are explained previously):
@@ -526,7 +523,7 @@ interpolationSchemes
     default            linear;
 }
 ```
-Picture
+![](images/sol_sett_1.PNG)
 
 ---
 ### Case numerical settings: fvSolution
@@ -739,6 +736,159 @@ The code for the thermoLinGeomSolidModel class is located at:
 
 Let us examine the “evolve” function of this class to see the equations solved…
 
+```
+bool thermalLinGeomSolid::evolve()
+{
+    Info<< "Evolving thermal solid solver" << endl;
+
+    int iCorr = 0;
+    lduSolverPerformance solverPerfD;
+    lduSolverPerformance solverPerfT;
+    blockLduMatrix::debug = 0;
+
+    Info<< "Solving coupled energy and displacements equation for T and D"
+        << endl;
+
+    // Momentum-energy coupling outer loop                                                                                                                                                                        
+    do
+    {
+        // Store fields for under-relaxation and residual calculation                                                                                                                                                          
+        T().storePrevIter();
+
+        // Heat equation                                                                                                                                                                                                       
+        fvScalarMatrix TEqn
+        (
+            rhoC_*fvm::ddt(T_)
+         == fvm::laplacian(k_, T_, "laplacian(k,T)")
+          + (sigma() && fvc::grad(U()))
+        );
+...
+```
+- Note: U in the code is velocity and D is displacement; however, in the slides u represents displacement
+
+![](images/sol_code_1.PNG)
+
+```
+        // Under-relaxation the linear system                                                                                                                                                                                  
+        TEqn.relax();
+
+        // Solve the linear system                                                                                                                                                                                             
+        solverPerfT = TEqn.solve();
+
+        // Under-relax the field                                                                                                                                                                                               
+        T_.relax();
+
+        // Update gradient of temperature                                                                                                                                                                                      
+        gradT_ = fvc::grad(T_);
+
+        // Store fields for under-relaxation and residual calculation                                                                                                                                                          
+        D().storePrevIter();
+
+        // Linear momentum equation total displacement form
+        fvVectorMatrix DEqn
+        (
+            rho()*fvm::d2dt2(D())
+         == fvm::laplacian(impKf_, D(), "laplacian(DD,D)")
+          - fvc::laplacian(impKf_, D(), "laplacian(DD,D)")
+          + fvc::div(sigma(), "div(sigma)")
+          + rho()*g()
+          + mechanical().RhieChowCorrection(D(), gradD())
+        );
+...
+```
+![](images/sol_code_2.PNG)
+
+- Also, we add an additional diffusion term to quell numerical oscillations (e.g. checker-boarding) based on Rhie-Chow correction:
+
+![](images/sol_code_3.PNG)
+![](images/sol_code_4.PNG)
+
+```
+        // Under-relaxation the linear system                                                                                                                                                                                  
+        TEqn.relax();
+
+        // Solve the linear system                                                                                                                                                                                             
+        solverPerfT = TEqn.solve();
+
+        // Under-relax the field                                                                                                                                                                                               
+        T_.relax();
+
+        // Update gradient of temperature                                                                                                                                                                                      
+        gradT_ = fvc::grad(T_);
+
+        // Store fields for under-relaxation and residual calculation                                                                                                                                                          
+        D().storePrevIter();
+
+        // Linear momentum equation total displacement form
+        fvVectorMatrix DEqn
+        (
+            rho()*fvm::d2dt2(D())
+         == fvm::laplacian(impKf_, D(), "laplacian(DD,D)")
+          - fvc::laplacian(impKf_, D(), "laplacian(DD,D)")
+          + fvc::div(sigma(), "div(sigma)")
+          + rho()*g()
+          + mechanical().RhieChowCorrection(D(), gradD())
+        );
+...
+```
+
+![](images/sol_code_5.PNG)
+```
+        // Under-relaxation the linear system
+        DEqn.relax();
+
+        // Solve the linear system
+        solverPerfD = DEqn.solve();
+
+        // Under-relax the field
+        relaxField(D(), iCorr);
+
+        // Update increment of displacement
+        DD() = D() - D().oldTime();
+
+        // Update velocity
+        U() = fvc::ddt(D());
+
+        // Update gradient of displacement
+        mechanical().grad(D(), gradD());
+
+        // Update gradient of displacement increment
+        gradDD() = gradD() - gradD().oldTime();
+
+        // Calculate the stress using run-time selectable mechanical law
+        mechanical().correct(sigma());
+...
+```
+- Stress is calculated by run-time selectable *mechanicalLaw*, chosen in the *mechanicalProperties* dictionary
+```
+        // Update impKf to improve convergence
+        // Note: impK and rImpK are not updated as they are used for traction
+        // boundaries
+        if (iCorr % 10 == 0)
+        {
+            impKf_ = mechanical().impKf();
+        }
+    }
+    while
+    (
+        !converged(iCorr, solverPerfD, solverPerfT, D(), T_)
+     && ++iCorr < nCorr()
+    ); // loop around TEqn and DEqn
+
+    // Interpolate cell displacements to vertices
+    mechanical().interpolate(D(), pointD());
+
+    // Increment of displacement
+    DD() = D() - D().oldTime();
+
+    // Increment of point displacement
+    pointDD() = pointD() - pointD().oldTime();
+
+    return true;
+}
+```
+- Choice of impK can affect convergence (but not the answer - assuming convergence is achieved) i.e. tangent matrix in finite element analysis
+
 #### MechanicalLaw: code
 
 For the *hotSphere* test case, we have selected the *thermoLinearElastic* mechanical law in the case *mechanicalProperties* dictionary: this class will perform the calculation of stress for the solid.
@@ -753,7 +903,7 @@ Let us examine the “correct” function of this class to see how the stress is
 
 Duhamel-Neumann form of Hooke’s law:
 
-Pic of eq
+![](images/sol_code_6.PNG)
 
 ```
 void Foam::thermoLinearElastic::correct(volSymmTensorField& sigma)
@@ -829,6 +979,6 @@ void Foam::linearElastic::correct(volSymmTensorField& sigma)
 ```
 Standard Hooke’s law can be expressed in a number of equivalent forms:
 
-Pic of eq
+![](images/sol_code_7.PNG)
 
 ---
