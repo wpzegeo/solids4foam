@@ -1,16 +1,24 @@
-## **My First Solid Case**: hotSphere
+# **My First Solid Case**: hotSphere
 
 
 
-### Case Overview
+## Case Overview
+pic
+
+This case analyses the stresses and displacements generated in a spherical pressure vessel subjected to an increasing internal pressure and temperature.
+
+The problem is 1-D axisymmetric in nature, but for demonstration purposes one eighth of the vessel is modelled here and symmetry planes are used.
+
+The outer surface of the vessel is stress/traction free and the heat flux is given by Newton’s law of cooling (a simplified convection boundary condition).
+
+*internal pressure and temperature are a function of time
+
+## Expected Results
+pic
 
 
 
-### Expected Results
-
-
-
-### Theory
+## Theory
 
 - We expect the vessel to deform due to the applied pressure and also due to the thermal gradient.
 
@@ -117,16 +125,238 @@ $> # or paraFoam -nativeReader
 
 <!-- Pictures of paraview -->
 
+The stress tensor has 6 components
 
+2 pic of directions
 
+The von Mises stress (aka equivalent stress, sigmaEq) is commonly used to assess regions closest to failure:
+
+pic of eq
+
+The strain tensor also has 6 components; and we can define an equivalent strain compatible with the equivalent stress.
+
+pic of strain
+
+*These definitions of strain are only correct when the strains AND rotations are small; otherwise, see large/finite strain measures (e.g. Green strain, true strain) in e.g. Mase, Male, 1999, Continuum Mechanics for Engineers
+
+---
+### **Let us examine the hotSphere case structure in more detail …**
+
+```
+hotSphere
+├── 0
+│   ├── D
+│   └── T
+├── Allclean
+├── Allrun
+├── constant
+│   ├── dynamicMeshDict
+│   ├── g
+│   ├── mechanicalProperties
+│   ├── physicsProperties
+│   ├── polyMesh
+│   │   └── …
+│   ├── solidProperties
+│   ├── thermalProperties
+│   ├── timeVsPressure
+│   └── timeVsTemperature
+├── hotSphere.msh
+└── system
+    ├── controlDict
+    ├── fvSchemes
+    └── fvSolution
+
+```
+#### In this case, there are two primitive variables:
+
+- displacement (vector)
+- temperature (scalar)
+```
+├── 0
+│   ├── D   displacement vector field
+│   └── T   temperature scalar field
+```
+For displacement, we specify a zero-traction condition on the outer wall:
+```
+outside
+{
+    type            solidTraction;
+    traction        uniform ( 0 0 0 );
+    pressure        uniform 0;
+    value           uniform (0 0 0);
+}
+```
+Note: pressure here is referring to the normal component of the boundary traction vector: in general, this is not the same as the hydrostatic pressure. The total applied traction is: *appliedTraction = traction - n\*pressure*
+where n is the boundary unit normal field
+and a time-varying traction condition on the inside wall:
+```
+inside
+{
+    type            solidTraction;
+    traction        uniform ( 0 0 0 );
+    pressureSeries
+    {
+        fileName “$FOAM_CASE/constant/timeVsPressure";
+        outOfBounds clamp;
+    }
+    value           uniform (0 0 0);
+}
+```
+where *timeVsPressure* specifies time vs pressure:
+```
+(
+    ( 0 0 )
+    ( 5 1e6 )
+)
+```
+For the temperature field, we specify a convection condition (Newton’s law of cooling) on the outside:
+```
+outside
+{
+    type            thermalConvection;
+    alpha           uniform 90;
+    Tinf            300;
+    value           uniform 300;
+}
+```
+pic of equations
+
+and a time-varying temperature on the inside wall:
+```
+inside
+{
+    type            fixedTemperature;
+    temperatureSeries
+    {
+       fileName "$FOAM_CASE/constant/timeVsTemperature";
+       outOfBounds clamp;
+    }
+    value           uniform 300;
+}
+```
+where *timeVsTemperature* specifies time vs temperature:
+```
+(
+    ( 0 300 )
+    ( 5 500 )
+)
+```
+Each tutorial contains an *Allrun* and *Allclean* script to run and clean/reset the case, e.g.
+```
+$> Allrun
+```
+Examining the *Allrun* script, this case requires two steps to run: create the mesh, and run the the *solids4Foam* solver:
+```
+$> fluentMeshToFoam hotSphere.msh
+$> solids4Foam
+```
+Note: the mesh can be created in any external meshing software and then imported into OpenFOAM
+
+---
+#### All *solids4foam* cases require the **physicsProperties** dictionary; this allows the user to specify a **fluid** analysis, **solid** analysis, or **fluid-solid interaction** analysis:
+```
+│   ├── dynamicMeshDict
+│   ├── g
+│   ├── mechanicalProperties
+│   ├── physicsProperties
+│   ├── polyMesh
+│   │   └── …
+│   ├── solidProperties
+│   ├── thermalProperties
+│   ├── timeVsPressure
+│   └── timeVsTemperature
+├── hotSphere.msh
+└── system
+```
+
+```
+//type  fluid;   
+type    solid;
+//type  fluidSolidInteraction;
+```
+In this case, we can see it is a solid analysis.
+
+If a solid analysis is selected in the **physicsProperties** dictionary, then *solids4Foam* will look for the **solidProperties** dictionary in the constant directory.
+
+Similarly, the **fluidProperties** dictionary is required for a fluid analysis, and the **fsiProperties** dictionary for a fluid-solid interaction analysis.
+
+These dictionaries let us specify the details of what type of solid, fluid or fluid-solid interaction analysis is to be performed.
+
+The **solidProperties** dictionary specifies:
+```
+solidModel     
+thermalLinearGeometry;
+
+thermalLinearGeometryCoeffs
+{
+    nCorrectors          10000;
+
+    solutionTolerance    1e-6;
+
+    alternativeTolerance 1e-7;
+
+    infoFrequency        100;
+}
+```
+The **thermalLinearGeometry** is a solid mathematical model where the heat equation is solved (**thermal-**) and a linear geometry (**-LinearGeometry**) mechanical approach is taken.
+
+A **linear geometry** approach is also known as a “small strain” or “small strain/rotation” approach and means that we assume the cell geometry (volumes, face areas, etc.) to be **independent of the displacement field**. 
+
+This assumption is typically OK when the deformation is “small”. *Nonlinear geometry approaches (large strain approaches) are outside the scope of this training*.
+
+Remember the equations discussed previously in the “Theory” section; we will go through the relevant code later, and also the meaning of these settings.
+
+A “solid” analysis requires the definition of the mechanical properties via the **mechanicalProperties** dictionary; in this case the *thermoLinearElastic* law is specified (Duhamel-Nuemann form of Hooke’s law):
+
+pic of equation
+
+```
+mechanical
+(
+    steel
+    {
+        type  thermoLinearElastic;
+        rho   rho [1 -3 0 0 0 0 0] 7750;
+        E     E [1 -1 -2 0 0 0 0] 190e+9;
+        nu    nu [0 0 0 0 0 0 0] 0.305;
+        alpha alpha [0 0 0 -1 0 0 0] 9.7e-06;
+        T0    T0 [0 0 0 1 0 0 0] 300;
+    }
+);
+```
+As we are performing a heat analysis, we also need to specify the thermal properties via the **thermalProperties** dictionary; in this case the constant law is specified (Fourier’s conduction law) by specific heat (C) and thermal conductivity (k):
+
+pic of equation
+```
+thermal
+{
+    type      constant;
+    C         C [0 2 -2 -1 0 0 0] 486;
+    k         k [1 1 -3 -1 0 0 0] 20;
+}
+```
+In all cases, we must also specify a *dynamicMeshDict*; in this case, it is set to *staticFvMesh*, which does not change the mesh during the simulation:
+```
+dynamicFvMesh   staticFvMesh;
+```
+and the gravity field (g) must be specified: here we set it to zero to disable it. Try set it (0 -9.81 0) and see how it affects the results.
+```
+dimensions      [0 1 -2 0 0 0 0];
+value           ( 0 0 0 );
+```
+
+---
 ### **hotSphere**: running the solver
 
 Let us now examine the output from the solids4Foam solver; first clean the case and prepare the mesh:
+```
 $> ./Allclean && fluentMeshToFoam hotSphere.msh
+```
 
 Next run the solids4Foam solver:
+```
 $> solids4Foam
-
+```
 
 We will look at the solver output …
 ```
@@ -158,12 +388,12 @@ where the tolerance is specified in the solidProperties dictionary. In this case
 
 ### **hotSphere**: running the solver in parallel
 
-To run the solids4Foam solver in parallel for solid and fluid cases (we will examine fluid-solid interaction later), copy the decomposeParDict into the case:
+To run the *solids4Foam* solver in parallel for solid and fluid cases (we will examine fluid-solid interaction later), copy the *decomposeParDict* into the case:
 ```
 $> cp $FOAM_UTILITIES/parallelProcessing/decomposePar/decomposeParDict system/
 ```
 
-Edit the decomposeParDict (e.g. using emacs - in the docker container, you can install emacs or vim using e.g. “apt-get install vim”) to use the “simple” method with 4 cores:
+Edit the *decomposeParDict* (e.g. using emacs - in the docker container, you can install emacs or vim using e.g. “apt-get install vim”) to use the “simple” method with 4 cores:
 ```
 numberOfSubdomains  4;
 method              simple;
@@ -194,26 +424,405 @@ $> # or “touch case.foam && paraview case.foam”
 
 <!--images-->
 
-### Case Settings
+## Case Settings
+Next, we will explain the purpose of different **numerical settings** (physical properties, such as *g*, *mechanicalProperties* and *thermalProperties* are explained previously):
+- solidProperties
+- fvSchemes
+- fvSolution
+```
+hotSphere
+├── 0
+│   ├── D
+│   └── T
+├── Allclean
+├── Allrun
+├── constant
+│   ├── dynamicMeshDict
+│   ├── g
+│   ├── mechanicalProperties
+│   ├── physicsProperties
+│   ├── polyMesh
+│   │   └── …
+│   ├── solidProperties
+│   ├── thermalProperties
+│   ├── timeVsPressure
+│   └── timeVsTemperature
+├── hotSphere.msh
+└── system
+    ├── controlDict
+    ├── fvSchemes
+    └── fvSolution
+```
 
-#### Case numerical settings: solidProperties
-#### Case numerical settings: fvSchemes
-#### Case numerical settings: fvSolution
+### Case numerical settings: solidProperties
+As noted previously, the chosen *solidModel* is specified in the *solidProperties* dictionary; additionally, numerical settings and tolerances for the chosen *solidModel* can be specified (most be default to a good choice). Examining the *hotSphere* case, we see:
+```
+solidModel     thermalLinearGeometry;
+
+thermalLinearGeometryCoeffs
+{
+    // Maximum number of correctors                                                                                                                                                                                            
+    nCorrectors     10000;
+
+    // Solution tolerance                                                                                                                                                                                                      
+    solutionTolerance 1e-6;
+
+    // Alternative solution tolerance                                                                                                                                                                                           
+    alternativeTolerance 1e-7;
+
+    // Write frequency for the residuals                                       
+    infoFrequency  100;
+}
+```
+- These four settings refer to the outer loop around the momentum (and heat) equation.
+Iterations will continue until either the D (and T) have converged to the specific **tolerances**, or the maximum number of correctors has been reached. If **nCorrectors** is reached, this means the equations have not converged to the required tolerance!
+The frequency of writing residuals to the standard output is controlled by **infoFrequency**.
+---
+### Case numerical settings: fvSchemes
+Switching between **steadyState** and **transient** analyses requires changing the *d2dt2* and *ddt* schemes.
 
 
-### Code
+The **gradient** schemes should almost always be “leastSquares” as the standard “Gauss linear” method can produce large errors in the stress field for skewed cells.
 
-#### *hotSphere*: **examining the code**
+```
+d2dt2Schemes
+{
+    default            Euler; // or steadyState
+}
 
+ddtSchemes
+{
+    default            Euler; // or steadyState
+}
+
+gradSchemes
+{
+    default            leastSquares;
+}
+
+divSchemes
+{
+    default            Gauss linear;
+}
+
+laplacianSchemes
+{
+    default            Gauss linear corrected;
+}
+
+snGradSchemes
+{
+    default            corrected;
+}
+
+interpolationSchemes
+{
+    default            linear;
+}
+```
+Picture
+
+---
+### Case numerical settings: fvSolution
+
+The D (and T) equations are very similar to the p equation in standard CFD approaches; as such, the conjugate gradient (PCG) or the algebraic multi-grid (GAMG) **linear solvers** tend to work best. The relTol can set be 0.1 as outer iterations are performed over the momentum equation until convergence.
+
+In general, the D equation and field do not require **under-relaxation**; however, in some cases (e.g. in contact analysis) equation relaxation can help, or for poor meshes, field relaxation can help.
+
+Relaxation factors less than 0.1 will be result in a prohibitively slow solution procedures.
+```
+solvers
+{
+    "D|DD|T"
+    {
+        solver          PCG;
+        preconditioner  FDIC;
+        tolerance       1e-09;
+        relTol          0.1;
+    }
+}
+
+relaxationFactors
+{
+    equations
+    {
+        //D    0.999;
+    }
+    fields
+    {
+        //D    0.7;
+    }
+}
+```
+
+---
+
+## Code
+
+#### *hotSphere*: examining the code
+
+The *solids4foam* toolbox structure is similar to that of OpenFOAM:
+```
+solids4foam
+├── Allwclean
+├── Allwmake
+├── README.md
+├── ThirdParty
+├── applications
+│   ├── solvers
+│   │   └── solids4Foam
+│   └── utilities
+├── filesToReplaceInOF
+├── src
+│   ├── …
+│   └── solids4FoamModels
+└── tutorials
+```
+- Scripts to compile and clean the toolbox:
+    ```
+    $> ./Allwmake
+    $> ./Allwclean
+    ```
+
+    The README file briefly describes the toolbox.
+
+    *solids4foam* requires some ThirdParty code (e.g. Eigen header library): this is automatically downloaded (and compiled if needed) in the ThirdParty directory
+- The *applications* directory contains the solver and utilities: there is only one solver, it is called *solids4Foam*.
+
+    The utilities are for pre- and post-processing.
+
+
+    *filesToReplaceInOF* contains source code files from the main OpenFOAM libraries with bug-fixes: the *Allwmake* script will ask you to copy these into place.
+- The src directory contains the *solids4FoamModels* library (as well as others) used by the *solids4Foam* solver, including the fluid, solid and fluidSolidInteraction algorithms. 
+
+
+
+    As discussed previously, the *tutorial* directory contains example cases for fluid, solid and fluidSolidInteraction analyses.
+
+Let us examine the solids4Foam solver code:
+
+>solids4foam/applications/solvers/solids4Foam/solids4Foam.C
+
+```
+int main(int argc, char *argv[])
+{
+#   include "setRootCase.H"
+#   include "createTime.H"
+#   include "solids4FoamWriteHeader.H"
+
+    // Create the general physics class  
+    // This is a run-time selectable class, so within the case we can decide to
+    // solve a fluid, solid or fluid-solid interaction model
+    autoPtr<physicsModel> physics = physicsModel::New(runTime);
+    while (runTime.run())
+        {
+            // Update deltaT, if desired, before moving to the next step                                                                                                                                                           
+            // Fluid or solid methodologies may have time-step limitations
+
+            physics().setDeltaT(runTime);
+
+            runTime++;
+
+            Info<< "Time = " << runTime.timeName() << nl << endl;
+
+            // This is where the mathematical model equations will be solved, e.g.
+            // fluid equations, solid equations, or both for fluid-solid interaction
+
+            physics().evolve();
+
+            // This function lets the physics model know we have reached the end of
+            // of the time-step, in case it needs to update fields
+
+            physics().updateTotalFields();
+            if (runTime.outputTime())
+        {
+            // Solid physics models often create and write extra fields when
+            // fields are being written
+            physics().writeFields(runTime);
+        }
+
+        Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
+            << "  ClockTime = " << runTime.elapsedClockTime() << " s"
+            << nl << endl;
+    } // end of time loop
+
+    // Let the physics model know it is the end of the simulation in case it needs
+    // to clean anything up
+    physics().end();
+
+    Info<< nl << "End" << nl << endl;
+
+    return(0);
+}
+```
+---
 #### Physics Model
+The physicsModel is an abstract base class, where there are currently three derived classes:
+- fluidModel
+- solidModel
+- fluidSolidInterface, where fluidSolidInterface creates its own fluidModel and solidModel
 
+Each of these three classes are also abstract base classes, where specific fluid, solid, and fluid-solid interaction implementations derive from them: see next slide.
+
+---
 #### *hotSphere*: **examining the code**
 
+Examining the *solids4FoamModels* library structure:
+solids4foam
+```
+├── ... 
+└── src
+    ├── …
+    └── solids4FoamModels
+        ├── ...
+        ├── dynamicFvMesh
+        ├── fluidModels
+        ├── fluidSolidInterfaces
+        ├── functionObjects
+        ├── materialModels
+        ├── numerics
+        ├── physicsModel
+        └── solidModels
+```
+The fluidModels, solidsModels and fluidSolidInterfaces are stored in separate directories.
+
+In addition, the physicsModel is located here.
+
+---
 #### Physics Model: Fluid Models
 
+For example, there are currently a number of fluid models implementations that derive from the fluidModel base class:
+- *icoFluid*
+- *pUCoupledFluid*
+- *pisoFluid*
+- *transientSimpleFluid*
+- *interFluid*
+- *buoyantBoussinesqPimpleFluid*
+- *...*
+
+Each of these fluidModels corresponds to a standard fluid solver in OpenFOAM, which has been repackaged into a class form. 
+
 #### Physics Model: Solis Models
+The solid models implementations, deriving from the solidModel base class, include:
+- *linGeomSolid*
+- *thermalLinGeomSolid*
+- *coupledUnsLinGeomLinearElasticSolid*
+- *nonLinGeomTotalLagSolid*
+- *nonLinGeomUpdatedLagSolid*
+- *poroLinGeomSolid*
+- *...*
+
 #### Physics Model: Fluid-Solid Interaction Models
+The fluid-solid interaction models implementations, deriving from the fluidSolidInterface base class, include:
+- *fixedRelaxationCouplingInterface*
+- *AitkenCouplingInterface*
+- *IQNILSCouplingInterface*
+- *weakCouplingInterface*
+- *oneWayCouplingInterface*
+- *...*
+
+Each method employs a different approach for coupling the fluid and the solid domains.
+
 
 #### hotSpere: code
+For the hotSphere test case, we have selected a “solid” analysis in the physicsProperties dictionary: this means a solidModel class will be selected; then, we specify the actual solidModel class to be the thermoLinGeomSolidModel class.
+
+The code for the thermoLinGeomSolidModel class is located at:
+>solids4foam/src/solids4FoamModels/solidModels/thermalLinGeomSolid/thermalLinGeomSolid.C
+
+
+Let us examine the “evolve” function of this class to see the equations solved…
 
 #### MechanicalLaw: code
+
+For the *hotSphere* test case, we have selected the *thermoLinearElastic* mechanical law in the case *mechanicalProperties* dictionary: this class will perform the calculation of stress for the solid.
+
+The code for the **thermoLinearElastic** mechanical law class is located at:
+>solids4foam/src/solids4FoamModels/materialModels/mechanicalModel/mechanicalLaws/linearGeometryLaws/thermoLinearElastic/thermoLinearElastic.C
+
+
+Let us examine the “correct” function of this class to see how the stress is calculated …
+
+
+
+Duhamel-Neumann form of Hooke’s law:
+
+Pic of eq
+
+```
+void Foam::thermoLinearElastic::correct(volSymmTensorField& sigma)
+{
+    // Calculate linear elastic stress
+    linearElastic::correct(sigma);
+
+    if (TPtr_.valid())
+    {
+        // Add thermal stress component
+        sigma -= 3.0*K()*alpha_*(TPtr_() - T0_)*symmTensor(I);
+    }
+    else
+    {
+        // Lookup the temperature field from the solver
+        const volScalarField& T = mesh().lookupObject<volScalarField>("T");
+
+        // Add thermal stress component
+        sigma -= 3.0*K()*alpha_*(T - T0_)*symmTensor(I);
+    }
+}
+```
+As **thermoLinearElastic** derives from the **linearElastic law**, we will also examine the “correct” function for this class:
+>solids4foam/src/solids4FoamModels/materialModels/mechanicalModel/mechanicalLaws/linearGeometryLaws/linearElastic/linearElastic.C
+```
+void Foam::linearElastic::correct(volSymmTensorField& sigma)
+{
+   // Calculate total strain
+    if (incremental())
+    {
+        // Lookup gradient of displacement increment
+        const volTensorField& gradDD =
+            mesh().lookupObject<volTensorField>("grad(DD)");
+
+        epsilon_ = epsilon_.oldTime() + symm(gradDD);
+    }
+    else
+    {
+        // Lookup gradient of displacement
+        const volTensorField& gradD =
+            mesh().lookupObject<volTensorField>("grad(D)");
+
+        epsilon_ = symm(gradD);
+    }
+    // For planeStress, correct strain in the out of plane direction
+        if (planeStress())
+        {
+            if (mesh().solutionD()[vector::Z] > -1)
+            {
+                FatalErrorIn
+                (
+                    "void Foam::linearElasticMisesPlastic::"
+                    "correct(volSymmTensorField& sigma)"
+                )   << "For planeStress, this material law assumes the empty "
+                    << "direction is the Z direction!" << abort(FatalError);
+            }
+
+            epsilon_.replace
+            (
+                symmTensor::ZZ,
+            -(nu_/E_)
+            *(sigma.component(symmTensor::XX) + sigma.component(symmTensor::YY))
+            );
+        }
+        // Hooke's law : standard form
+    //sigma = 2.0*mu_*epsilon_ + lambda_*tr(epsilon_)*I + sigma0_;
+
+    // Hooke's law : partitioned deviatoric and dilation form
+    const volScalarField trEpsilon = tr(epsilon_);
+    calculateHydrostaticStress(sigmaHyd_, trEpsilon);
+    sigma = 2.0*mu_*dev(epsilon_) + sigmaHyd_*I + sigma0_;
+}
+```
+Standard Hooke’s law can be expressed in a number of equivalent forms:
+
+Pic of eq
+
+---
