@@ -1,4 +1,4 @@
 test for pictures
 
-![](image/Picture2.png)
+![](README/Picture2.png)
 
