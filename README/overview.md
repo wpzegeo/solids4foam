@@ -13,14 +13,19 @@ In addition, the toolbox should be compatible will all major OpenFOAM forks, as 
 solids4foam builds on the toolboxes *stressAnalysis*, *solidMechanics* and *extendBazaar*
 
 ### Modular Approach
+<img src="tutorial/images/Modular_app_1.PNG" width = 700 >
 
-![](tutorial/image/Modular_app_1.png)
-![](tutorial/image/mod_app_2.png)
-![](tutorial/image/mod_a_3.png)
-![](tutorial/image/mod_a_4.png)
-![](tutorial/image/mod_a_5.png)
-![](tutorial/image/mod_a_6.png)
-![](tutorial/image/mod_a_7.png)
+<img src="tutorial/images/mod_app_2.PNG" width = 700 >
+
+<img src="tutorial/images/mod_a_3.PNG" width = 700 >
+
+<img src="tutorial/images/mod_a_4.PNG" width = 700 >
+
+<img src="tutorial/images/mod_a_5.PNG" width = 700 >
+
+<img src="tutorial/images/mod_a_6.PNG" width = 700 >
+
+<img src="tutorial/images/mod_a_7.PNG" width = 700 >
 
 
 ### Coding Style
@@ -60,12 +65,14 @@ if (myName == “Philip”)
 ```
 
 ### Finite Volume vs Finite Difference vs Finite Element
+<img src="tutorial/images/finite_1.PNG" width = 500 >
 
-pic
+---
 
 The finite volume method is a generalisation of the finite difference method, in terms of geometry and topology
 
 But the methods differ in their philosophy …
 
-pic
-pic
+![](tutorial/images/finite_2.PNG)
+
+![](tutorial/images/finite_3.PNG)
