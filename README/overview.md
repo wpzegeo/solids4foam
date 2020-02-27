@@ -1,4 +1,5 @@
 test for pictures
 
-![PLZ](README/Picture2.png)
+![README](Picture2.png)
+![image](image/Picture2.png)
 
