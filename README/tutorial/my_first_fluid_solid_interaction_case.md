@@ -308,6 +308,8 @@ The fluid and solid decomposeParDicts are shown below.
 
 and
 >beamInCrossFlow/system/fluid/decomposeParDict
+
+
 ```
 numberOfSubdomains 4;
 
@@ -315,7 +317,10 @@ method          metis;
 
 Note: globalFaceZones are no longer required.
 ```
+
+
 ## Case Settings & Tips
+
 ```
 beamInCrossFlow/elasticBeam
 ├── 0
@@ -340,9 +345,11 @@ beamInCrossFlow/elasticBeam
     └── solid
        └── ...
 ```
+
 Next, we will briefly discuss **numerical settings** specific to the FSI procedures, as given in the *fsiProperties* dictionary.
 
 The *fsiProperties* dictionary sets the type of coupling algorithm to use, as well as the settings for this coupling algorithm.
+
 
 ### fsiProperties dictionary
 
