@@ -2,17 +2,35 @@
 
 ## Case Overview
 
+#### Running our first fluid case: cylinderInChannel
+
+![](images/flu_over_1.PNG)
+![](images/flu_over_2.PNG)
+
+
+This is the classic “**flow over a cylinder in a channel**” test case, as analysed by, for example, Ferziger and Peric (2002). The problem is modelled as 2-D.
+
+The **inlet flow velocity profile is specified** (coming in from the left) and the **outlet (right) gauge pressure is zero**.
+
+The upper wall, lower wall and cylinder are **no slip walls**.
+
 ## Expected Results
+
+For Re = 100, the flow is expected to be unsteady with vortices shedding from the cylinder.
+
+![](images/flu_over_3.PNG)
+
 
 ## Theory
 
 We assume an incompressible Newtonian isothermal laminar fluid, where the Navier-Stokes governing equations take the form:
 
-<!-- equations-->
+![](images/flu_run_1.png)
+
 
 ### Theory: solution methodology
 
-In this case, we will use a transient version of the SIMPLE algorithm (e.g. pimpleFoam); we could have also used PISO or a coupled approach.
+In this case, we will use a **transient** version of the **SIMPLE** algorithm (e.g. pimpleFoam); we could have also used PISO or a coupled approach.
 
 ```
 for all time-steps
@@ -49,10 +67,10 @@ We will now look at the results in ParaView:
 $> paraFoam # or “paraFoam -nativeReader”
 $> # or “touch case.foam && paraview case.foam”
 ```
+<img src="images/flu_theo_1.PNG" width = "500">
 
-<!-- oicture of case-->
 
-Let us examine the cylinderInChannel case structure and discuss the similarities and differences between a “fluid” case and a “solid” case
+Let us examine the cylinderInChannel case structure and discuss the **similarities** and **differences** between a “fluid” case and a “solid” case
 
 ```
 cylinderInChannel
@@ -79,13 +97,13 @@ cylinderInChannel
 ```
 - The case setup is the same as a typical “*simpleFoam/pimpleFoam*” case, apart for a couple of small differences.
 
-    *physicsProperties*: in this case, we specify the analysis type to be “fluid”:
+    **physicsProperties**: in this case, we specify the analysis type to be “fluid”:
     ```
     type     fluid;
     //type   solid;
     //type   fluidSolidInteraction;
     ```
-- For a fluid analysis, we must specify the type of fluid model in the *fluidProperties* dictionary; in this case we will use a transient SIMPLE approach for a incompressible isothermal fluid:
+- For a fluid analysis, we must specify the type of fluid model in the **fluidProperties** dictionary; in this case we will use a transient SIMPLE approach for a incompressible isothermal fluid:
     ```
     fluidModel transientSimpleFluid;
     transientSimpleFluidCoeffs
@@ -124,7 +142,7 @@ cylinderInChannel
     ├── fvSchemes
     └── fvSolution
 ```
-- Settings for the solution algorithm (e.g. SIMPLE or PISO) are specified in the *fluidProperties* dictionary (as opposed to the fvSolution) dictionary:
+- Settings for the solution algorithm (e.g. SIMPLE or PISO) are specified in the **fluidProperties** dictionary (as opposed to the fvSolution) dictionary:
     ```
     transientSimpleFluidCoeffs
     {
