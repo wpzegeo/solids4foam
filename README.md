@@ -23,4 +23,4 @@
     - #### Running the Case
     - #### Structure
 
-- ### [References & Acknowledgement]((https://wpzegeo.github.io/solids4foam/README/tutorial/references)
+- ### [References & Acknowledgement](https://wpzegeo.github.io/solids4foam/README/tutorial/references)
