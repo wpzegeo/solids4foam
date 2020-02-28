@@ -13,19 +13,25 @@ In addition, the toolbox should be compatible will all major OpenFOAM forks, as 
 solids4foam builds on the toolboxes *stressAnalysis*, *solidMechanics* and *extendBazaar*
 
 ### Modular Approach
-<img src="tutorial/images/Modular_app_1.PNG" width = 700 >
+<!--<img src="tutorial/images/Modular_app_1.PNG" width = 700 > -->
+![](images/Modular_app_1.PNG)
+<!--<img src="tutorial/images/mod_app_2.PNG" width = 700 > -->
+![](images/mod_app_2.PNG)
 
-<img src="tutorial/images/mod_app_2.PNG" width = 700 >
+<!--<img src="tutorial/images/mod_a_3.PNG" width = 700 > -->
+![](images/m_app_3.PNG)
 
-<img src="tutorial/images/mod_a_3.PNG" width = 700 >
+<!--<img src="tutorial/images/mod_a_4.PNG" width = 700 > -->
+![](images/m_app_4.PNG)
 
-<img src="tutorial/images/mod_a_4.PNG" width = 700 >
+<!--<img src="tutorial/images/mod_a_5.PNG" width = 700 > -->
+![](images/m_app_5.PNG)
 
-<img src="tutorial/images/mod_a_5.PNG" width = 700 >
+<!--<img src="tutorial/images/mod_a_6.PNG" width = 745 > -->
+![](images/m_app_6.PNG)
 
-<img src="tutorial/images/mod_a_6.PNG" width = 745 >
-
-<img src="tutorial/images/mod_a_7new.PNG" width = 700 >
+<!--<img src="tutorial/images/mod_a_7new.PNG" width = 700 > -->
+![](images/m_app_7.PNG)
 
 
 ### Coding Style
