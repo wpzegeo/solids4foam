@@ -309,6 +309,7 @@ The fluid and solid decomposeParDicts are shown below.
 and
 >beamInCrossFlow/system/fluid/decomposeParDict
 
+
 ```
 numberOfSubdomains 4;
 
@@ -316,6 +317,7 @@ method          metis;
 
 Note: globalFaceZones are no longer required.
 ```
+
 
 ## Case Settings & Tips
 
