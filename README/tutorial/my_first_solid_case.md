@@ -480,7 +480,9 @@ thermalLinearGeometryCoeffs
 - These four settings refer to the outer loop around the momentum (and heat) equation.
 Iterations will continue until either the D (and T) have converged to the specific **tolerances**, or the maximum number of correctors has been reached. If **nCorrectors** is reached, this means the equations have not converged to the required tolerance!
 The frequency of writing residuals to the standard output is controlled by **infoFrequency**.
+
 ---
+
 ### Case numerical settings: fvSchemes
 Switching between **steadyState** and **transient** analyses requires changing the *d2dt2* and *ddt* schemes.
 

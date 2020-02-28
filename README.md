@@ -17,7 +17,7 @@
     - #### Running the Case
     - #### Structure
 
-- ### [My First Fluid-Solid Interaction Case](https://wpzegeo.github.io/solids4foam/README/tutorial/my_first_fluid-solid_interaction_case)
+- ### [My First Fluid-Solid Interaction Case](https://wpzegeo.github.io/solids4foam/README/tutorial/my_first_fluid_solid_interaction_case)
     - #### Overview
     - #### Theory
     - #### Running the Case
