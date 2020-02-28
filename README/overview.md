@@ -13,19 +13,20 @@ In addition, the toolbox should be compatible will all major OpenFOAM forks, as 
 solids4foam builds on the toolboxes *stressAnalysis*, *solidMechanics* and *extendBazaar*
 
 ### Modular Approach
-<img src="tutorial/images/Modular_app_1.PNG" width = 700 >
 
-<img src="tutorial/images/mod_app_2.PNG" width = 700 >
+![](tutorial/images/Modular_app_1.PNG)
 
-<img src="tutorial/images/mod_a_3.PNG" width = 700 >
+![](tutorial/images/mod_app_2.PNG)
 
-<img src="tutorial/images/mod_a_4.PNG" width = 700 >
+![](tutorial/images/mod_a_3.PNG)
 
-<img src="tutorial/images/mod_a_5.PNG" width = 700 >
+![](tutorial/images/mod_a_4.PNG)
 
-<img src="tutorial/images/mod_a_6.PNG" width = 745 >
+![](tutorial/images/mod_a_5.PNG)
 
-<img src="tutorial/images/mod_a_7new.PNG" width = 700 >
+![](tutorial/images/mod_a_6.PNG)
+
+![](tutorial/images/mod_a_7new.PNG)
 
 
 ### Coding Style
@@ -65,7 +66,8 @@ if (myName == “Philip”)
 ```
 
 ### Finite Volume vs Finite Difference vs Finite Element
-<img src="tutorial/images/finite_1.PNG" width = 500 >
+<!-- <img src="tutorial/images/finite_1.PNG" width = 500 > -->
+![](tutorial/images/finite_1.PNG)
 
 ---
 
