@@ -96,3 +96,17 @@ linearElasticMisesPlastic/linearElasticMisesPlastic.C
 ![](images/plate4.png)
 ![](images/plate5.png)
 
+---
+## Models
+
+tutorials/solids/elastoplasticity/pipeCrush
+
+![](images/pipecrush.png)
+
+tutorials/solids/elastoplasticity/neckingBar
+
+![](images/neckingbar.png)
+
+tutorials/solids/elastoplasticity/impactBar
+
+![](images/billet.png)
