@@ -15,15 +15,15 @@ Run the case using the Allrun script:
 $> ./Allrun
 ```
 
-<!-- insert pic -->
+![](images/punch1_2.PNG)
 
 
 This case demonstrates the use of
 “contact” boundary conditions and the
 “cfMesh” Cartesian meshing software.
 
-<!-- insert 3-4pic -->
-<!-- insert 5-6pic -->
+![](images/punch3_4.PNG)
+![](images/punch5_6.PNG)
 
 ## viscoTube Case
 
@@ -40,14 +40,17 @@ $> blockMesh && solids4Foam
 
 This case demonstrates a visco-elastic solid
 <!-- insert 12combo or 1 than 2 -->
+![](images/tube1_2combooption.PNG)
+![](images/tube1.PNG)
+![](images/tube2.PNG)
 
 ### Problem Definition
 
-<!-- insert 34 -->
+![](images/tube3_4.PNG)
 
 ### Stress relaxation of a viscoelastic tube
 
-<!-- insert 56 -->
+![](images/tube5_6.PNG)
 
 See code at: solids4foam/src/solids4FoamModels/materialModels/
 mechanicalModel/mechanicalLaws/linearGeometryLaws/
@@ -79,7 +82,7 @@ $> blockMesh && solids4Foam
 
 This case demonstrates a Mises/J2 elasto-plastic solid:
 
-<!-- insert 1 -->
+![](images/plate1.PNG)
 
 See code at: solids4foam/src/solids4FoamModels/
 materialModels/mechanicalModel/
@@ -88,11 +91,13 @@ linearElasticMisesPlastic/linearElasticMisesPlastic.C
 
 ### Problem definition
 
-<!-- insert 2-3 -->
+![](images/plate2_3.PNG)
 
 ### Perforated Elastic Plate
 
-<!-- insert 4 -->
-<!-- insert 5 -->
+![](images/plate4.PNG)
+![](images/plate5.PNG)
 
 ### possible media???
+![](images/tube1media.AVI)
+![](images/tub2media.AVI)
