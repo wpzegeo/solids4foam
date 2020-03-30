@@ -112,6 +112,5 @@ tutorials/solids/elastoplasticity/neckingBar
 ### impactBar
 tutorials/solids/elastoplasticity/impactBar
 
-![](images/billet.png)
 
 ---
