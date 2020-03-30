@@ -23,4 +23,6 @@
     - #### Running the Case
     - #### Structure
 
+- ### [Running More Solid Cases](https://wpzegeo.github.io/solids4foam/README/tutorial/more_solid_cases)
+
 - ### [References & Acknowledgement](https://wpzegeo.github.io/solids4foam/README/tutorial/references)
