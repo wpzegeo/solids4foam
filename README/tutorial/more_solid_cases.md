@@ -99,14 +99,18 @@ linearElasticMisesPlastic/linearElasticMisesPlastic.C
 ---
 ## Models
 
+### pipeCrush
 tutorials/solids/elastoplasticity/pipeCrush
 
 ![](images/pipecrush.png)
-
+---
+### neckingBar
 tutorials/solids/elastoplasticity/neckingBar
 
 ![](images/neckingbar.png)
-
+---
+### impactBar
 tutorials/solids/elastoplasticity/impactBar
 
 ![](images/billet.png)
+---
