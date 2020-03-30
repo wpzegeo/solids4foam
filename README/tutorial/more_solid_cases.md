@@ -41,8 +41,6 @@ $> blockMesh && solids4Foam
 This case demonstrates a visco-elastic solid
 <!-- insert 12combo or 1 than 2 -->
 ![](images/tube1_2combooption.png)
-![](images/tube1.png)
-![](images/tube2.png)
 
 ### Problem Definition
 
@@ -98,6 +96,3 @@ linearElasticMisesPlastic/linearElasticMisesPlastic.C
 ![](images/plate4.png)
 ![](images/plate5.png)
 
-### possible media???
-![](images/tube1media.avi)
-![](images/tub2media.avi)
