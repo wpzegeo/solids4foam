@@ -273,7 +273,6 @@ Alternative fsi residual: 5.70555e-07
 ```
 - The solids4Foam solver will output the fluidModel residual information, the fluid mesh motion solver information, and also the solidModel residual information: each of these three component should converge. In addition, if you are using a strongly coupled approach, it is important that the FSI loop converges within each time-step.
 
-pic maybe
 
 ### Running the solver in parallel for FSI analyses
 To run the *solids4Foam* solver in parallel for fluid-solid interaction cases, copy the *decomposeParDict* into the case (the *beamInCrossFlow* case already has decomposeParDicts in place).
@@ -416,8 +415,8 @@ fluidSolidInterface    Aitken;
 ```
 
 ### Tips for fluid-solid interaction analysis
-### Problem
-: when I view the fluid and solid in ParaView, there is a gap between the fluid and solid interface: the solid domain does not align with the fluid domain. 
+### Problem:
+when I view the fluid and solid in ParaView, there is a gap between the fluid and solid interface: the solid domain does not align with the fluid domain. 
 
 **Solution 1**: some of the solidModels use a non-moving mesh formulation so, by default, some solids may not move at all when shown in ParaView. To show the solid domain deformation/motion in ParaView, select the solid case and use the “Warp By Vector” filter with the displacement (“D” or “pointD”) field. If there is still a gap between the fluid and solid, see Solution 2 below.
 
