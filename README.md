@@ -1,5 +1,5 @@
-# solids4foam
-## Solids4FOAM Documetation
+
+# Solids4foam Documetation
 
 - ### [Installation](https://wpzegeo.github.io/solids4foam/README/installation)
 
