@@ -46,7 +46,7 @@ solids4Foam is now setup and ready to use!
 
 ---
 
-  ## Installing solids4foam using **Docker**
+## Installing solids4foam using **Docker**
   
   **Docker Toolbox** : Legacy desktop solution. Docker Toolbox is for older Mac and Windows systems that do not meet the requirements of Docker Desktop for Mac and Docker Desktop for Windows. We recommend updating to the newer applications, if possible. Docker Toolbox is an installer for quick setup and launch of a Docker environment on older Mac and Windows systems that do not meet the requirements of the new [Docker Desktop for Mac](https://docs.docker.com/docker-for-mac/) and [Docker Desktop for Windows](https://docs.docker.com/docker-for-windows/) apps.
 
